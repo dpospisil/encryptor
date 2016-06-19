@@ -1,8 +1,6 @@
 /*
  * -----------------------------------------------------------------------\
- * SilverWare
- *  
- * Copyright (C) 2014 - 2016 the original author or authors.
+ * Copyright (C) 2016 the original author or authors.
  *  
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +15,7 @@
  * limitations under the License.
  * -----------------------------------------------------------------------/
  */
-package org.marvec.licenses;
+package org.marvec.encryptor.api;
 
 /**
  * @author <a href="mailto:marvenec@gmail.com">Martin Večeřa</a>

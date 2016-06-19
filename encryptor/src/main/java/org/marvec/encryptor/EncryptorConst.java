@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------\
- * Copyright (C) 2014 - 2016 the original author or authors.
+ * Copyright (C) 2016 the original author or authors.
  *  
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,22 +15,16 @@
  * limitations under the License.
  * -----------------------------------------------------------------------/
  */
-package org.marvec.licenses;
-
-import java.io.Serializable;
+package org.marvec.encryptor;
 
 /**
  * @author <a href="mailto:marvenec@gmail.com">Martin Večeřa</a>
  */
-public class SimpleMessage implements Serializable {
+public class EncryptorConst {
 
-   private String payload;
+   public static final String THREAD_COUNT = "encryptor.threads";
 
-   public String getPayload() {
-      return payload;
-   }
+   public static final String PORT_NUMBER = "encryptor.port";
 
-   public void setPayload(final String payload) {
-      this.payload = payload;
-   }
+   public static final String THREAD_NAME_PREFIX = "encryptor-request-";
 }

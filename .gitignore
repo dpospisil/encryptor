@@ -10,3 +10,4 @@ buildNumber.properties
 .vertx/
 .idea/
 **/*.iml
+file-uploads/
