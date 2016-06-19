@@ -32,3 +32,9 @@ curl -X POST http://localhost:8080/decrypt -d '{"encryptedPayload" : "...", "pri
 curl -X POST http://localhost:8080/sign -d '{"message":"hello", "privateKey":"PEM formatted key"}'
 curl -X POST http://localhost:8080/verify -d '{"message":"hello", "signature":"...", "privateKey":"PEM formatted key"}'
 ```
+
+## Configuration
+
+The port where the application runs can be configured via the _encryptor.port_ system property.
+
+The number of threads for processing the requests can be set with the _encryptor.threads_ system property.
