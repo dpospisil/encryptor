@@ -35,6 +35,7 @@ curl -X POST http://localhost:8080/verify -d '{"message":"hello", "signature":".
 
 ## Configuration
 
-The port where the application runs can be configured via the _encryptor.port_ system property.
+The port where the application runs can be configured via the _encryptor.port_ system property. The service always runs at localhost as it
+provides its services unsecured. It is supposed to install a public HTTPS enabled proxy in front of it.
 
 The number of threads for processing the requests can be set with the _encryptor.threads_ system property.
