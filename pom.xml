@@ -1,0 +1,50 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+
+   <groupId>org.marvec</groupId>
+   <artifactId>licenses-parent</artifactId>
+   <version>1.0-SNAPSHOT</version>
+   <packaging>pom</packaging>
+
+   <name>licenses</name>
+   <licenses>
+      <license>
+         <name>The Apache Software License, Version 2.0</name>
+         <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+         <distribution>repo</distribution>
+         <comments>A business-friendly OSS license</comments>
+      </license>
+   </licenses>
+
+   <properties>
+      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+      <maven.assembly.plugin.version>2.5.3</maven.assembly.plugin.version>
+      <maven.clean.plugin.version>2.5</maven.clean.plugin.version>
+      <maven.jar.plugin.version>2.4</maven.jar.plugin.version>
+      <maven.compiler.plugin.version>3.2</maven.compiler.plugin.version>
+      <maven.exec.plugin.version>1.2</maven.exec.plugin.version>
+      <maven.source.plugin.version>2.4</maven.source.plugin.version>
+      <maven.javadoc.plugin.version>2.10.1</maven.javadoc.plugin.version>
+      <maven.surefire.plugin.version>2.18.1</maven.surefire.plugin.version>
+      <maven.dependency.plugin.version>2.8</maven.dependency.plugin.version>
+   </properties>
+
+   <modules>
+      <module>licenses-bom</module>
+      <module>licenses-util</module>
+      <module>licenses</module>
+   </modules>
+
+   <dependencyManagement>
+      <dependencies>
+         <dependency>
+            <groupId>org.marvec</groupId>
+            <artifactId>licenses-bom</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>import</scope>
+         </dependency>
+      </dependencies>
+   </dependencyManagement>
+</project>
