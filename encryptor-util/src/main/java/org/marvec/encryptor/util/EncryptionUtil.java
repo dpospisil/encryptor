@@ -91,8 +91,27 @@ public class EncryptionUtil {
     *       When it was not possible to initialize the keys.
     */
    public EncryptionUtil() throws EncryptionException {
-      publicKey = getPemPublicKey(PUBLIC_KEY_RESOURCE);
-      privateKey = getPemPrivateKey(PRIVATE_KEY_RESOURCE);
+      try {
+         publicKey = getPemPublicKey(readResource(PUBLIC_KEY_RESOURCE));
+         privateKey = getPemPrivateKey(readResource(PRIVATE_KEY_RESOURCE));
+      } catch (IOException e) {
+         throw new EncryptionException("Unable to initialize encryptor: ", e);
+      }
+   }
+
+   /**
+    * Gets the encryption utility initialized with the provided key pair.
+    *
+    * @param publicKey
+    *       Public key as a string.
+    * @param privateKey
+    *       Private key as a string.
+    * @throws EncryptionException
+    *       When it was not possible to initialize the keys.
+    */
+   public EncryptionUtil(final String publicKey, final String privateKey) throws EncryptionException {
+      this.publicKey = publicKey != null ? getPemPublicKey(publicKey) : null;
+      this.privateKey = privateKey != null ? getPemPrivateKey(privateKey) : null;
    }
 
    /**
@@ -109,18 +128,17 @@ public class EncryptionUtil {
    }
 
    /**
-    * Initializes a private key from a resource.
+    * Initializes a private key from a string.
     *
-    * @param resourceName
-    *       The name of the resource where to take the key from.
+    * @param keyString
+    *       String representation of the key.
     * @return An initialized private key.
     * @throws EncryptionException
     *       When it was not possible to initialize the key.
     */
-   private PrivateKey getPemPrivateKey(final String resourceName) throws EncryptionException {
+   private PrivateKey getPemPrivateKey(final String keyString) throws EncryptionException {
       try {
-         final String temp = readResource(resourceName);
-         final String privKeyPEM = temp.replace("-----BEGIN PRIVATE KEY-----\n", "").replace("-----END PRIVATE KEY-----", "").replaceAll("\n", "");
+         final String privKeyPEM = keyString.replace("-----BEGIN PRIVATE KEY-----\n", "").replace("-----END PRIVATE KEY-----", "").replaceAll("\n", "");
 
          final Base64 b64 = new Base64();
          final byte[] decoded = b64.decode(privKeyPEM);
@@ -129,24 +147,23 @@ public class EncryptionUtil {
          final KeyFactory kf = KeyFactory.getInstance(ALGORITHM);
 
          return kf.generatePrivate(spec);
-      } catch (NoSuchAlgorithmException | InvalidKeySpecException | IOException e) {
+      } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
          throw new EncryptionException("Unable to obtain private key: ", e);
       }
    }
 
    /**
-    * Initializes a public key from a resource.
+    * Initializes a public key from a string.
     *
-    * @param resourceName
-    *       The name of the resource where to take the key from.
+    * @param keyString
+    *       String representation of the key.
     * @return An initialized public key.
     * @throws EncryptionException
     *       When it was not possible to initialize the key.
     */
-   private PublicKey getPemPublicKey(final String resourceName) throws EncryptionException {
+   private PublicKey getPemPublicKey(final String keyString) throws EncryptionException {
       try {
-         final String temp = readResource(resourceName);
-         final String publicKeyPEM = temp.replace("-----BEGIN PUBLIC KEY-----\n", "").replace("-----END PUBLIC KEY-----", "");
+         final String publicKeyPEM = keyString.replace("-----BEGIN PUBLIC KEY-----\n", "").replace("-----END PUBLIC KEY-----", "");
 
          final Base64 b64 = new Base64();
          final byte[] decoded = b64.decode(publicKeyPEM);
@@ -155,7 +172,7 @@ public class EncryptionUtil {
          final KeyFactory kf = KeyFactory.getInstance(ALGORITHM);
 
          return kf.generatePublic(spec);
-      } catch (NoSuchAlgorithmException | InvalidKeySpecException | IOException e) {
+      } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
          throw new EncryptionException("Unable to obtain public key: ", e);
       }
    }

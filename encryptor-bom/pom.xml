@@ -23,7 +23,6 @@
 
       <maven.clean.plugin.version>2.5</maven.clean.plugin.version>
 
-      <version.slf4j>1.7.21</version.slf4j>
       <version.log4j>2.5</version.log4j>
       <version.testng>6.9.10</version.testng>
       <version.commons-codec>1.10</version.commons-codec>
@@ -38,6 +37,13 @@
             <groupId>org.marvec</groupId>
             <artifactId>encryptor-util</artifactId>
             <version>${project.version}</version>
+         </dependency>
+
+         <!-- Logging -->
+         <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>${version.log4j}</version>
          </dependency>
 
          <!-- Commons -->

@@ -17,6 +17,12 @@
  */
 package org.marvec.encryptor;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.marvec.encryptor.api.DecryptionRequest;
+import org.marvec.encryptor.api.EncryptionRequest;
+import org.marvec.encryptor.api.SignRequest;
+import org.marvec.encryptor.api.VerifyRequest;
 import org.marvec.encryptor.util.EncryptionException;
 
 import io.vertx.core.Vertx;
@@ -31,31 +37,37 @@ import io.vertx.ext.web.handler.BodyHandler;
  */
 public class Boot {
 
+   private static final Logger log = LogManager.getLogger(Boot.class);
+
    private final EncryptionHandler encryptionHandler;
 
-   private Boot() throws EncryptionException {
+   private HttpServer server;
+
+   public Boot() throws EncryptionException {
       this.encryptionHandler = new EncryptionHandler();
    }
 
-   private void startServer() {
-      System.out.println("Starting encryption service...");
+   public void startServer() {
+      log.info("Starting encryption service...");
 
       Vertx vertx = Vertx.vertx();
-      HttpServer server = vertx.createHttpServer();
+      server = vertx.createHttpServer();
 
       Router router = Router.router(vertx);
 
       router.route("/*").handler(BodyHandler.create());
-      router.post("/encrypt/private").handler((context) -> encryptionHandler.createTask(context, encryptionHandler::encryptMessageWithPrivate));
-      router.post("/encrypt/public").handler((context) -> encryptionHandler.createTask(context, encryptionHandler::encryptMessageWithPublic));
-      router.post("/decrypt/private").handler((context) -> encryptionHandler.createTask(context, encryptionHandler::decryptMessageWithPrivate));
-      router.post("/decrypt/public").handler((context) -> encryptionHandler.createTask(context, encryptionHandler::decryptMessageWithPublic));
-      router.post("/sign").handler((context) -> encryptionHandler.createTask(context, encryptionHandler::signMessage));
-      router.get("/verify").handler((context) -> encryptionHandler.createTask(context, encryptionHandler::verifyMessage));
+      router.post("/encrypt").handler((context) -> encryptionHandler.submitTask(context, EncryptionRequest.class));
+      router.post("/decrypt").handler((context) -> encryptionHandler.submitTask(context, DecryptionRequest.class));
+      router.post("/sign").handler((context) -> encryptionHandler.submitTask(context, SignRequest.class));
+      router.get("/verify").handler((context) -> encryptionHandler.submitTask(context, VerifyRequest.class));
 
-      System.out.println("Service started, hit <Ctrl>-C to exit...");
+      log.info("Service started, hit <Ctrl>-C to exit...");
 
       server.requestHandler(router::accept).listen(Integer.getInteger(EncryptorConst.PORT_NUMBER, 8080));
+   }
+
+   public void stop() {
+      server.close();
    }
 
    public static void main(String[] args) throws EncryptionException {

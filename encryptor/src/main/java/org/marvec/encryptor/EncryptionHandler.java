@@ -17,12 +17,10 @@
  */
 package org.marvec.encryptor;
 
-import org.marvec.encryptor.api.EncryptedMessage;
-import org.marvec.encryptor.api.Signature;
-import org.marvec.encryptor.api.SimpleMessage;
-import org.marvec.encryptor.api.Verify;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.marvec.encryptor.api.KeyRequest;
 import org.marvec.encryptor.util.EncryptionException;
-import org.marvec.encryptor.util.EncryptionUtil;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -30,8 +28,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
 
+import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.Json;
 import io.vertx.ext.web.RoutingContext;
 
@@ -40,12 +38,14 @@ import io.vertx.ext.web.RoutingContext;
  */
 public class EncryptionHandler implements Closeable {
 
-   private final EncryptionUtil encryptionUtil;
+   private static final Logger log = LogManager.getLogger(EncryptionHandler.class);
+
+   // extensive usage, cache the value
+   private static final boolean debugEnabled = log.isDebugEnabled();
 
    private final ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Integer.getInteger(EncryptorConst.THREAD_COUNT, 10), new DaemonThreadFactory(EncryptorConst.THREAD_NAME_PREFIX));
 
-   EncryptionHandler() throws EncryptionException {
-      encryptionUtil = new EncryptionUtil();
+   EncryptionHandler() {
    }
 
    @Override
@@ -53,68 +53,27 @@ public class EncryptionHandler implements Closeable {
       executor.shutdownNow();
    }
 
-   private void encryptMessage(final RoutingContext routingContext, final EncryptionUtil.KeyType keyType) {
-      final SimpleMessage message = Json.decodeValue(routingContext.getBodyAsString(), SimpleMessage.class);
-
+   private <T extends KeyRequest> void processRequest(final RoutingContext routingContext, final Class<T> expectedRequestType) {
       try {
+         final T message = Json.decodeValue(routingContext.getBodyAsString(), expectedRequestType);
+
+         if (debugEnabled) {
+            log.debug("Processing message: {}", message.toString());
+         }
+
          routingContext.response().putHeader("content-type", "application/json; charset=utf-8")
-                       .end(Json.encodePrettily(new EncryptedMessage(encryptionUtil.encrypt(message.getPayload(), keyType))));
+                       .end(Json.encodePrettily(message.process()));
       } catch (EncryptionException e) {
-         routingContext.response().setStatusCode(500).setStatusMessage("Unable to encrypt message: " + e.getMessage()).end();
+         log.error("Unable to process request: ", e);
+         routingContext.response().setStatusCode(500).setStatusMessage("Unable to process request.").end();
+      } catch (DecodeException de) {
+         log.error("Unable to decode request: ", de);
+         routingContext.response().setStatusCode(500).setStatusMessage("Unable to process request.").end();
       }
    }
 
-   void encryptMessageWithPrivate(final RoutingContext routingContext) {
-      encryptMessage(routingContext, EncryptionUtil.KeyType.PRIVATE);
-   }
-
-   void encryptMessageWithPublic(final RoutingContext routingContext) {
-      encryptMessage(routingContext, EncryptionUtil.KeyType.PUBLIC);
-   }
-
-   private void decryptMessage(final RoutingContext routingContext, final EncryptionUtil.KeyType keyType) {
-      final EncryptedMessage message = Json.decodeValue(routingContext.getBodyAsString(), EncryptedMessage.class);
-
-      try {
-         routingContext.response().putHeader("content-type", "application/json; charset=utf-8")
-                       .end(Json.encodePrettily(new SimpleMessage(encryptionUtil.decrypt(message.getEncryptedPayload(), keyType))));
-      } catch (EncryptionException e) {
-         routingContext.response().setStatusCode(500).setStatusMessage("Unable to encrypt message: " + e.getMessage()).end();
-      }
-   }
-
-   void decryptMessageWithPrivate(final RoutingContext routingContext) {
-      decryptMessage(routingContext, EncryptionUtil.KeyType.PRIVATE);
-   }
-
-   void decryptMessageWithPublic(final RoutingContext routingContext) {
-      decryptMessage(routingContext, EncryptionUtil.KeyType.PUBLIC);
-   }
-
-   void signMessage(final RoutingContext routingContext) {
-      final SimpleMessage message = Json.decodeValue(routingContext.getBodyAsString(), SimpleMessage.class);
-
-      try {
-         routingContext.response().putHeader("content-type", "application/json; charset=utf-8")
-                       .end(Json.encodePrettily(new Signature(encryptionUtil.sign(message.getPayload()))));
-      } catch (EncryptionException e) {
-         routingContext.response().setStatusCode(500).setStatusMessage("Unable to sign message: " + e.getMessage()).end();
-      }
-   }
-
-   void verifyMessage(final RoutingContext routingContext) {
-      final Verify message = Json.decodeValue(routingContext.getBodyAsString(), Verify.class);
-
-      try {
-         routingContext.response().putHeader("content-type", "application/json; charset=utf-8")
-                       .end(Json.encodePrettily(encryptionUtil.verify(message.getMessage(), message.getSignature())));
-      } catch (EncryptionException e) {
-         routingContext.response().setStatusCode(500).setStatusMessage("Unable to sign message: " + e.getMessage()).end();
-      }
-   }
-
-   void createTask(final RoutingContext context, final Consumer<RoutingContext> action) {
-      executor.submit(() -> action.accept(context));
+   void submitTask(final RoutingContext context, final Class expectedRequestType) {
+      executor.submit(() -> processRequest(context, expectedRequestType));
    }
 
    private static class DaemonThreadFactory implements ThreadFactory {

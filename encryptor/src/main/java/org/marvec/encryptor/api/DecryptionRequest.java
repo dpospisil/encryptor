@@ -17,36 +17,29 @@
  */
 package org.marvec.encryptor.api;
 
+import org.marvec.encryptor.util.EncryptionException;
+import org.marvec.encryptor.util.EncryptionUtil;
+
 /**
  * @author <a href="mailto:marvenec@gmail.com">Martin Večeřa</a>
  */
-public class Verify {
+public class DecryptionRequest extends KeyRequest<SimpleMessage> {
 
-   private String message;
+   private byte[] message;
 
-   private String signature;
-
-   public Verify() {
-   }
-
-   public Verify(final String message, final String signature) {
-      this.message = message;
-      this.signature = signature;
-   }
-
-   public String getMessage() {
+   public byte[] getMessage() {
       return message;
    }
 
-   public void setMessage(final String message) {
+   public void setMessage(final byte[] message) {
       this.message = message;
    }
 
-   public String getSignature() {
-      return signature;
+   @Override
+   public SimpleMessage doProcess() throws EncryptionException {
+      checkAttribute(message);
+
+      return new SimpleMessage(encryptionUtil.decrypt(message, (getPublicKey() != null || getPrivateKey() == null)? EncryptionUtil.KeyType.PUBLIC : EncryptionUtil.KeyType.PRIVATE));
    }
 
-   public void setSignature(final String signature) {
-      this.signature = signature;
-   }
 }
