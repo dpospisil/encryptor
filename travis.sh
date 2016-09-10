@@ -30,7 +30,7 @@ PING_LOOP_PID=$!
 # My build is using maven, but you could build anything with this, E.g.
 # your_build_command_1 >> $BUILD_OUTPUT 2>&1
 # your_build_command_2 >> $BUILD_OUTPUT 2>&1
-mvn install >> $BUILD_OUTPUT 2>&1
+mvn install 2>&1 | tee -a $BUILD_OUTPUT 
 
 # The build finished without returning an error so dump a tail of the output
 dump_output
