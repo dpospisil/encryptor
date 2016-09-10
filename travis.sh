@@ -34,10 +34,14 @@ echo "Ping loop PID $PING_LOOP_PID"
 # your_build_command_2 >> $BUILD_OUTPUT 2>&1
 mvn install >> $BUILD_OUTPUT 2>&1
 
+echo "Finished"
+
 # The build finished without returning an error so dump a tail of the output
 dump_output
 
 # nicely terminate the ping output loop
+echo "Killing ping loop"
 kill $PING_LOOP_PID
 sleep 1
 kill -9 $PING_LOOP_PID
+echo "Done"
