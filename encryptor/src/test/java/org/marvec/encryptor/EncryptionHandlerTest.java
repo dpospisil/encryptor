@@ -26,6 +26,8 @@ import org.marvec.encryptor.api.SimpleMessage;
 import org.marvec.encryptor.util.EncryptionException;
 import org.marvec.encryptor.util.EncryptionUtil;
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.util.concurrent.Semaphore;
@@ -65,6 +67,13 @@ public class EncryptionHandlerTest {
          + "nOeyMLKZmbrabsAk6wIDAQAB\n"
          + "-----END PUBLIC KEY-----\n";
 
+   private static int port = 8090;
+
+   @BeforeMethod
+   public void waitAfterTest() throws InterruptedException {
+      System.setProperty(EncryptorConst.PORT_NUMBER, "" + (port++));
+   }
+
    @Test
    public void testDefaultKey() throws EncryptionException, InterruptedException {
       final Boot boot = new Boot();
@@ -80,7 +89,7 @@ public class EncryptionHandlerTest {
       final Semaphore s = new Semaphore(0);
       final StringBuffer resp1 = new StringBuffer();
 
-      client.post(Integer.getInteger(EncryptorConst.PORT_NUMBER, 8080), "localhost", "/encrypt", responseHandler -> {
+      client.post(Integer.getInteger(EncryptorConst.PORT_NUMBER, 8080), "127.0.0.1", "/encrypt", responseHandler -> {
          responseHandler.bodyHandler(bodyHandler -> {
             resp1.append(new String(bodyHandler.getBytes()));
             s.release();
@@ -94,7 +103,7 @@ public class EncryptionHandlerTest {
       DecryptionRequest dec = new DecryptionRequest();
       dec.setMessage(Json.decodeValue(resp1.toString(), EncryptedMessage.class).getEncryptedPayload());
 
-      client.post(Integer.getInteger(EncryptorConst.PORT_NUMBER, 8080), "localhost", "/decrypt", responseHandler -> {
+      client.post(Integer.getInteger(EncryptorConst.PORT_NUMBER, 8080), "127.0.0.1", "/decrypt", responseHandler -> {
          responseHandler.bodyHandler(bodyHandler -> {
             resp2.append(new String(bodyHandler.getBytes()));
             s.release();
@@ -124,7 +133,7 @@ public class EncryptionHandlerTest {
       final Semaphore s = new Semaphore(0);
       final StringBuffer resp1 = new StringBuffer();
 
-      client.post(Integer.getInteger(EncryptorConst.PORT_NUMBER, 8080), "localhost", "/encrypt", responseHandler -> {
+      client.post(Integer.getInteger(EncryptorConst.PORT_NUMBER, 8080), "127.0.0.1", "/encrypt", responseHandler -> {
          responseHandler.bodyHandler(bodyHandler -> {
             resp1.append(new String(bodyHandler.getBytes()));
             s.release();
@@ -138,7 +147,7 @@ public class EncryptionHandlerTest {
       DecryptionRequest dec = new DecryptionRequest();
       dec.setMessage(Json.decodeValue(resp1.toString(), EncryptedMessage.class).getEncryptedPayload());
 
-      client.post(Integer.getInteger(EncryptorConst.PORT_NUMBER, 8080), "localhost", "/decrypt", responseHandler -> {
+      client.post(Integer.getInteger(EncryptorConst.PORT_NUMBER, 8080), "127.0.0.1", "/decrypt", responseHandler -> {
          responseHandler.bodyHandler(bodyHandler -> {
             resp2.append(new String(bodyHandler.getBytes()));
             s.release();
@@ -155,7 +164,7 @@ public class EncryptionHandlerTest {
       dec.setMessage(Json.decodeValue(resp1.toString(), EncryptedMessage.class).getEncryptedPayload());
       dec.setPublicKey(myPublicKey);
 
-      client.post(Integer.getInteger(EncryptorConst.PORT_NUMBER, 8080), "localhost", "/decrypt", responseHandler -> {
+      client.post(Integer.getInteger(EncryptorConst.PORT_NUMBER, 8080), "127.0.0.1", "/decrypt", responseHandler -> {
          responseHandler.bodyHandler(bodyHandler -> {
             resp3.append(new String(bodyHandler.getBytes()));
             s.release();
@@ -185,7 +194,7 @@ public class EncryptionHandlerTest {
       final Semaphore s = new Semaphore(0);
       final StringBuffer resp1 = new StringBuffer();
 
-      client.post(Integer.getInteger(EncryptorConst.PORT_NUMBER, 8080), "localhost", "/encrypt", responseHandler -> {
+      client.post(Integer.getInteger(EncryptorConst.PORT_NUMBER, 8080), "127.0.0.1", "/encrypt", responseHandler -> {
          responseHandler.bodyHandler(bodyHandler -> {
             resp1.append(new String(bodyHandler.getBytes()));
             s.release();
@@ -199,7 +208,7 @@ public class EncryptionHandlerTest {
       DecryptionRequest dec = new DecryptionRequest();
       dec.setMessage(Json.decodeValue(resp1.toString(), EncryptedMessage.class).getEncryptedPayload());
 
-      client.post(Integer.getInteger(EncryptorConst.PORT_NUMBER, 8080), "localhost", "/decrypt", responseHandler -> {
+      client.post(Integer.getInteger(EncryptorConst.PORT_NUMBER, 8080), "127.0.0.1", "/decrypt", responseHandler -> {
          responseHandler.bodyHandler(bodyHandler -> {
             resp2.append(new String(bodyHandler.getBytes()));
             s.release();
@@ -216,7 +225,7 @@ public class EncryptionHandlerTest {
       dec.setMessage(Json.decodeValue(resp1.toString(), EncryptedMessage.class).getEncryptedPayload());
       dec.setPrivateKey(myPrivateKey);
 
-      client.post(Integer.getInteger(EncryptorConst.PORT_NUMBER, 8080), "localhost", "/decrypt", responseHandler -> {
+      client.post(Integer.getInteger(EncryptorConst.PORT_NUMBER, 8080), "127.0.0.1", "/decrypt", responseHandler -> {
          responseHandler.bodyHandler(bodyHandler -> {
             resp3.append(new String(bodyHandler.getBytes()));
             s.release();

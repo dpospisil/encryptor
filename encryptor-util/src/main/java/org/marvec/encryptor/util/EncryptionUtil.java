@@ -138,7 +138,7 @@ public class EncryptionUtil {
     */
    private PrivateKey getPemPrivateKey(final String keyString) throws EncryptionException {
       try {
-         final String privKeyPEM = keyString.replace("-----BEGIN PRIVATE KEY-----\n", "").replace("-----END PRIVATE KEY-----", "").replaceAll("\n", "");
+         final String privKeyPEM = keyString.replace("-----BEGIN PRIVATE KEY-----", "").replace("-----END PRIVATE KEY-----", "").replaceAll("\\v", "");
 
          final Base64 b64 = new Base64();
          final byte[] decoded = b64.decode(privKeyPEM);
@@ -163,7 +163,7 @@ public class EncryptionUtil {
     */
    private PublicKey getPemPublicKey(final String keyString) throws EncryptionException {
       try {
-         final String publicKeyPEM = keyString.replace("-----BEGIN PUBLIC KEY-----\n", "").replace("-----END PUBLIC KEY-----", "");
+         final String publicKeyPEM = keyString.replace("-----BEGIN PUBLIC KEY-----", "").replace("-----END PUBLIC KEY-----", "").replaceAll("\\v", "");
 
          final Base64 b64 = new Base64();
          final byte[] decoded = b64.decode(publicKeyPEM);
