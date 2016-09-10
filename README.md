@@ -1,10 +1,9 @@
 [![Build Status][Travis badge]][Travis build]
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.marvec/encryptor/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.marvec/encryptor/)
+[![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
 
 [Travis badge]: https://travis-ci.org/marvec/encryptor.svg?branch=master
 [Travis build]: https://travis-ci.org/marvec/encryptor
-
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.marvec/encryptor/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.marvec/encryptor/)
-[![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
 
 # encryptor
 Encryption web service and utility library
