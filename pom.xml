@@ -3,10 +3,12 @@
 
    <groupId>org.marvec</groupId>
    <artifactId>encryptor-parent</artifactId>
-   <version>1.0-SNAPSHOT</version>
+   <version>1.0</version>
    <packaging>pom</packaging>
 
    <name>encryptor</name>
+   <description>Encryptor web service and utility library.</description>
+   <url>https://github.com/marvec/encryptor</url>
    <licenses>
       <license>
          <name>The Apache Software License, Version 2.0</name>
@@ -15,6 +17,17 @@
          <comments>A business-friendly OSS license</comments>
       </license>
    </licenses>
+   <developers>
+      <developer>
+         <name>Martin Večeřa</name>
+         <email>marvenec@gmail.com</email>
+      </developer>
+   </developers>
+   <scm>
+      <connection>scm:git:git://github.com/marvec/encryptor.git</connection>
+      <developerConnection>scm:git:ssh://github.com:marvec/encryptor.git</developerConnection>
+      <url>http://github.com/marvec/encryptor/tree/master</url>
+   </scm>
 
    <properties>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -26,6 +39,7 @@
       <maven.source.plugin.version>2.4</maven.source.plugin.version>
       <maven.javadoc.plugin.version>2.10.1</maven.javadoc.plugin.version>
       <maven.surefire.plugin.version>2.18.1</maven.surefire.plugin.version>
+      <maven.gpg.plugin.version>1.6</maven.gpg.plugin.version>
    </properties>
 
    <modules>
@@ -45,4 +59,29 @@
          </dependency>
       </dependencies>
    </dependencyManagement>
+
+   <profiles>
+      <profile>
+         <id>sign</id>
+         <build>
+            <plugins>
+               <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-gpg-plugin</artifactId>
+                  <version>${maven.gpg.plugin.version}</version>
+                  <executions>
+                     <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                           <goal>sign</goal>
+                        </goals>
+                     </execution>
+                  </executions>
+               </plugin>
+            </plugins>
+         </build>
+      </profile>
+   </profiles>
+
 </project>

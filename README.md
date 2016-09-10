@@ -3,18 +3,30 @@ Encryption web service and utility library
 
 ## Using the library
 
-```
-mvn install
+From Maven central:
+
+```xml
+   <dependency>
+      <groupId>org.marvec</groupId>
+      <artifactId>encryptor</artifactId>
+      <version>1.0</version>
+   </dependency>
 ```
 
-Now you can find the library in encryptor-util/target/encryptor-util-$VERSION.jar.
+Or compile yourself:
+
+```
+$ mvn install
+```
+
+Now you can find the library in `encryptor-util/target/encryptor-util-$VERSION.jar`.
 
 ## Usage of the web service
 
 ```
-mvn install
-cd encryptor
-mvn exec:exec
+$ mvn install
+$ cd encryptor
+$ mvn exec:exec
 ```
 
 Most APIs consume private and public keys. When the keys are omitted, the built-in keys from classpath are used.
@@ -39,3 +51,28 @@ The port where the application runs can be configured via the _encryptor.port_ s
 provides its services unsecured. It is supposed to install a public HTTPS enabled proxy in front of it.
 
 The number of threads for processing the requests can be set with the _encryptor.threads_ system property.
+
+## API usage
+
+It is possible to use encryptor just as a library in your own projects.
+However, you might suffer from having unnecessary dependencies on your classpath.
+In this case, you can definitely exclude _vertx-web_ in your Maven pom file.
+Vertx core is needed for JSON en-/de-coding.
+
+Sample usage of the API:
+
+```java
+   final EncryptionRequest er = new EncryptionRequest();
+   er.setPublicKey(publicKey);
+   er.setMessage(message);
+   final byte[] encryptedMessage = er.process().getEncryptedPayload();
+
+   final DecryptionRequest dr = new DecryptionRequest();
+   dr.setPrivateKey(privateKey);
+   dr.setMessage(encryptedMessage);
+
+   final String response = dr.process().getPayload();
+```
+
+It does not matter whether you use private or public key for encryption. It is up to your needs. However, always configure
+only one type of key for the request. If you need more details see the source code or submit an issue.

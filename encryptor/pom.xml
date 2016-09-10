@@ -4,14 +4,15 @@
    <parent>
       <groupId>org.marvec</groupId>
       <artifactId>encryptor-parent</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>1.0</version>
    </parent>
 
    <artifactId>encryptor</artifactId>
    <packaging>jar</packaging>
 
-   <name>encryptor</name>
-
+   <name>encryptor Encryption web service.</name>
+   <description>Encryptor web service and utility library.</description>
+   <url>https://github.com/marvec/encryptor</url>
    <licenses>
       <license>
          <name>The Apache Software License, Version 2.0</name>
@@ -20,6 +21,17 @@
          <comments>A business-friendly OSS license</comments>
       </license>
    </licenses>
+   <developers>
+      <developer>
+         <name>Martin Večeřa</name>
+         <email>marvenec@gmail.com</email>
+      </developer>
+   </developers>
+   <scm>
+      <connection>scm:git:git://github.com/marvec/encryptor.git</connection>
+      <developerConnection>scm:git:ssh://github.com:marvec/encryptor.git</developerConnection>
+      <url>http://github.com/marvec/encryptor/tree/master</url>
+   </scm>
 
    <properties>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -83,7 +95,14 @@
                </execution>
             </executions>
          </plugin>
-
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>${maven.gpg.plugin.version}</version>
+            <configuration>
+               <useAgent>true</useAgent>
+            </configuration>
+         </plugin>
          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
@@ -108,7 +127,6 @@
                   <target>${java.level}</target>
                </configuration>
             </plugin>
-
             <plugin>
                <groupId>org.apache.maven.plugins</groupId>
                <artifactId>maven-jar-plugin</artifactId>
@@ -122,7 +140,6 @@
                   </archive>
                </configuration>
             </plugin>
-
             <plugin>
                <groupId>org.apache.maven.plugins</groupId>
                <artifactId>maven-clean-plugin</artifactId>
@@ -143,7 +160,6 @@
                   </filesets>
                </configuration>
             </plugin>
-
             <plugin>
                <groupId>org.codehaus.mojo</groupId>
                <artifactId>exec-maven-plugin</artifactId>
@@ -152,7 +168,7 @@
                   <executable>java</executable>
                   <arguments>
                      <argument>-cp</argument>
-                     <classpath />
+                     <classpath/>
                      <argument>org.marvec.encryptor.Boot</argument>
                   </arguments>
                </configuration>
@@ -160,4 +176,26 @@
          </plugins>
       </pluginManagement>
    </build>
+   <profiles>
+      <profile>
+         <id>sign</id>
+         <build>
+            <plugins>
+               <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-gpg-plugin</artifactId>
+                  <executions>
+                     <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                           <goal>sign</goal>
+                        </goals>
+                     </execution>
+                  </executions>
+               </plugin>
+            </plugins>
+         </build>
+      </profile>
+   </profiles>
 </project>
