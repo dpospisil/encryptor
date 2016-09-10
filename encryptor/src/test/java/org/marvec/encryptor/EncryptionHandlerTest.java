@@ -77,7 +77,9 @@ public class EncryptionHandlerTest {
    @Test
    public void testDefaultKey() throws EncryptionException, InterruptedException {
       final Boot boot = new Boot();
-      new Thread(boot::startServer).start();
+      final Thread t = new Thread(boot::startServer);
+      t.setDaemon(true);
+      t.start();
 
       final Vertx vertx = Vertx.vertx();
       HttpClient client = vertx.createHttpClient();
@@ -120,7 +122,9 @@ public class EncryptionHandlerTest {
    @Test
    public void testCustomKey() throws EncryptionException, InterruptedException {
       final Boot boot = new Boot();
-      new Thread(boot::startServer).start();
+      final Thread t = new Thread(boot::startServer);
+      t.setDaemon(true);
+      t.start();
 
       final Vertx vertx = Vertx.vertx();
       HttpClient client = vertx.createHttpClient();
@@ -181,7 +185,9 @@ public class EncryptionHandlerTest {
    @Test
    public void testCustomKeyPubFirst() throws EncryptionException, InterruptedException {
       final Boot boot = new Boot();
-      new Thread(boot::startServer).start();
+      final Thread t = new Thread(boot::startServer);
+      t.setDaemon(true);
+      t.start();
 
       final Vertx vertx = Vertx.vertx();
       HttpClient client = vertx.createHttpClient();
