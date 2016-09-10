@@ -27,6 +27,8 @@ trap 'error_handler' ERR
 bash -c "while true; do echo \$(date) - building ...; sleep $PING_SLEEP; done" &
 PING_LOOP_PID=$!
 
+echo "Ping loop PID $PING_LOOP_PID"
+
 # My build is using maven, but you could build anything with this, E.g.
 # your_build_command_1 >> $BUILD_OUTPUT 2>&1
 # your_build_command_2 >> $BUILD_OUTPUT 2>&1
@@ -37,3 +39,5 @@ dump_output
 
 # nicely terminate the ping output loop
 kill $PING_LOOP_PID
+sleep 1
+kill -9 $PING_LOOP_PID
