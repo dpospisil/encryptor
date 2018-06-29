@@ -28,6 +28,11 @@ public class EncryptionUtilTest {
 
    private static final String ORIGINAL_MESSAGE = "Hello World!";
 
+    private static final String LONG_MESSAGE = "This is rather long message created to test encryption " +
+            "of large messages, more than 245 bytes in length to be more specific. This sentence does not have any " +
+            "meaning besides to make sure that the text is long enaught as I am too lazy to count the charactees. " +
+            "Hope it is all clear right now.";
+
    private static final String PRIVATE_KEY = "-----BEGIN PRIVATE KEY-----\n"
          + "MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDBqPcPVprF3kG5\n"
          + "0XxavWU170lFioEizJa8E4TnNl3iAtBh/my5rGV5P5I/6UrF6sxKfA5dJMAOFayK\n"
@@ -80,6 +85,13 @@ public class EncryptionUtilTest {
       final EncryptionUtil u = new EncryptionUtil();
 
       Assert.assertEquals(u.decrypt(u.encrypt(ORIGINAL_MESSAGE, encryptKeyType), decryptKeyType), ORIGINAL_MESSAGE);
+   }
+
+   @Test(dataProvider = "keyTypes")
+   public void encryptLongTest(final EncryptionUtil.KeyType encryptKeyType, final EncryptionUtil.KeyType decryptKeyType) throws EncryptionException {
+      final EncryptionUtil u = new EncryptionUtil();
+
+      Assert.assertEquals(u.decrypt(u.encrypt(LONG_MESSAGE, encryptKeyType), decryptKeyType), LONG_MESSAGE);
    }
 
    @Test

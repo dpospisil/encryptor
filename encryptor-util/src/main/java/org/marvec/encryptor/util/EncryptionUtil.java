@@ -22,7 +22,9 @@ import org.apache.commons.codec.binary.Base64;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyFactory;
@@ -66,6 +68,9 @@ public class EncryptionUtil {
     * String to hold name of the public key file.
     */
    private static final String PUBLIC_KEY_RESOURCE = "/org/marvec/encryptor/public_key.pem";
+
+   private static final int ENCRYPT_CHUNK_SIZE = 245;
+   private static final int DECRYPT_CHUNK_SIZE = 256;
 
    /**
     * Public RSA key.
@@ -192,14 +197,10 @@ public class EncryptionUtil {
       final Key key = keyType == KeyType.PRIVATE ? privateKey : publicKey;
 
       try {
-         // get an RSA cipher object and print the provider
-         final Cipher cipher = Cipher.getInstance(ALGORITHM);
-         // encrypt the plain text using the public key
-         cipher.init(Cipher.ENCRYPT_MODE, key);
-         final byte[] cipherText = cipher.doFinal(text.getBytes(DEFAULT_CHARSET));
+         final byte[] cipherText = cipher(true, key, text.getBytes(DEFAULT_CHARSET));
 
          return cipherText;
-      } catch (NoSuchAlgorithmException | InvalidKeyException | NoSuchPaddingException | BadPaddingException | IllegalBlockSizeException e) {
+      } catch (GeneralSecurityException e) {
          throw new EncryptionException("Unable to encrypt message: ", e);
       }
    }
@@ -219,16 +220,44 @@ public class EncryptionUtil {
       final Key key = keyType == KeyType.PRIVATE ? privateKey : publicKey;
 
       try {
-         // get an RSA cipher object and print the provider
-         final Cipher cipher = Cipher.getInstance(ALGORITHM);
-         // decrypt the text using the private key
-         cipher.init(Cipher.DECRYPT_MODE, key);
-         byte[] dectyptedText = cipher.doFinal(text);
+         final byte[] dectyptedText = cipher(false, key, text);
 
          return new String(dectyptedText, DEFAULT_CHARSET);
-      } catch (NoSuchAlgorithmException | InvalidKeyException | NoSuchPaddingException | BadPaddingException | IllegalBlockSizeException e) {
+      } catch (GeneralSecurityException e) {
          throw new EncryptionException("Unable to decrypt message: ", e);
       }
+   }
+
+   private byte[] cipher(boolean encrypt, Key key, byte[] msg) throws GeneralSecurityException {
+
+       final Cipher cipher = Cipher.getInstance(ALGORITHM);
+       final int mode = encrypt ? Cipher.ENCRYPT_MODE : Cipher.DECRYPT_MODE;
+
+       ByteBuffer buf = ByteBuffer.allocate(1024);
+       int pos = 0;
+
+       final int chunkSoze = encrypt ? ENCRYPT_CHUNK_SIZE : DECRYPT_CHUNK_SIZE;
+
+       while (pos < msg.length) {
+           cipher.init(mode, key);
+           int size = Math.min(chunkSoze, msg.length - pos);
+           byte[] chunk = cipher.doFinal(msg, pos, size);
+           if (buf.remaining() < chunk.length) buf = reallocate(buf);
+           buf.put(chunk);
+           pos +=size;
+       }
+       final int size = buf.position();
+       byte[] ret = new byte[size];
+       buf.flip();
+       buf.get(ret, 0, size);
+       return ret;
+   }
+
+   private ByteBuffer reallocate(ByteBuffer buf) {
+        ByteBuffer nb = ByteBuffer.allocate(buf.capacity() * 2);
+        buf.flip();
+        nb.put(buf);
+        return nb;
    }
 
    /**
